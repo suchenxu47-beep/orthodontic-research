@@ -1,0 +1,1552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orthodontic Research System - Firebase</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        /* Tab Styles */
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 10px;
+            padding: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Patient Assistant Styles */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .patient-id-section {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .data-status {
+            background: #e8f5e8;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        
+        .input-group {
+            margin-bottom: 10px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        input[type="text"]:focus, input[type="password"]:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+        
+        .chat-container {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: 1px solid #ddd;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+        
+        .user-message {
+            background: #e3f2fd;
+            margin-left: auto;
+            border-bottom-right-radius: 2px;
+        }
+        
+        .ai-message {
+            background: #f5f5f5;
+            margin-right: auto;
+            border-bottom-left-radius: 2px;
+        }
+        
+        .message-sender {
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 5px;
+            color: #666;
+        }
+        
+        .input-section {
+            display: flex;
+            gap: 10px;
+        }
+        
+        #user-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #5a6fd8;
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .loading {
+            color: #666;
+            font-style: italic;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .security-notice {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        
+        .patient-limit-info {
+            background: #e3f2fd;
+            padding: 8px;
+            border-radius: 5px;
+            margin: 5px 0;
+            font-size: 12px;
+            text-align: center;
+        }
+        
+        /* API Configuration Styles */
+        .api-config-section {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-left: 4px solid #2196F3;
+        }
+        
+        .api-status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .api-active {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+        
+        .api-inactive {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .api-info-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        /* Researcher Dashboard Styles */
+        .login-section {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .dashboard-content {
+            display: none;
+        }
+        
+        .patient-card {
+            background: white;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .filters {
+            background: white;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .research-actions {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .connection-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+        
+        .connection-online {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .connection-offline {
+            background: #f44336;
+            color: white;
+        }
+        
+        .realtime-indicator {
+            background: #4CAF50;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 10px;
+            margin-left: 5px;
+        }
+        
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+            margin-left: 10px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #4CAF50;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+    </style>
+    
+    <!-- Firebase SDK v9 -->
+    <script type="module">
+        // ==================== FIREBASE 配置 ====================
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getDatabase, ref, set, push, onValue, off, remove } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+        // 您的 Firebase 配置
+        const firebaseConfig = {
+            apiKey: "AIzaSyDPNAN8HhQcWunPeyNt5-Bm4xe55D--2HU",
+            authDomain: "orthodontic-research.firebaseapp.com",
+            databaseURL: "https://orthodontic-research-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "orthodontic-research",
+            storageBucket: "orthodontic-research.firebasestorage.app",
+            messagingSenderId: "353666920092",
+            appId: "1:353666920092:web:bc7fb9f17f930193844759",
+            measurementId: "G-8B5GDEGRM1"
+        };
+
+        // 初始化 Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // 将 Firebase 函数暴露给全局作用域
+        window.firebaseApp = app;
+        window.firebaseDatabase = database;
+        window.firebaseRef = ref;
+        window.firebaseSet = set;
+        window.firebasePush = push;
+        window.firebaseOnValue = onValue;
+        window.firebaseOff = off;
+        window.firebaseRemove = remove;
+        
+        console.log('✅ Firebase v9 initialized successfully');
+    </script>
+</head>
+<body>
+    <!-- Connection Status Indicator -->
+    <div id="connection-status" class="connection-status connection-offline">
+        🔴 Checking Firebase...
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('patient-tab')">🦷 Patient Assistant</div>
+        <div class="tab" onclick="switchTab('researcher-tab')">🔬 Researcher Dashboard</div>
+    </div>
+
+    <!-- Patient Assistant Tab -->
+    <div id="patient-tab" class="tab-content active">
+        <div class="header">
+            <h1>🦷 Orthodontic Research AI Assistant</h1>
+            <p>Your 24/7 Orthodontic Care Advisor</p>
+        </div>
+
+        <!-- DeepSeek API Configuration Section -->
+        <div class="api-config-section">
+            <h3>🔑 DeepSeek API Configuration</h3>
+            <div class="input-group">
+                <label for="api-key-input">DeepSeek API Key:</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="password" 
+                           id="api-key-input" 
+                           placeholder="Enter your DeepSeek API key (sk-...)"
+                           value="sk-735d83210a7f449bbc79450a8b15d267"
+                           style="flex: 1;">
+                    <button onclick="saveApiKey()">Save</button>
+                    <button onclick="testApiKey()" style="background: #FF9800;">Test</button>
+                </div>
+                <div class="api-info-text">
+                    🔐 Your API key is stored locally in your browser and never sent to our servers.
+                    <a href="https://platform.deepseek.com/api_keys" target="_blank" style="color: #2196F3; text-decoration: none;">
+                        Get API key ↗
+                    </a>
+                </div>
+            </div>
+            
+            <div class="api-status" id="api-status">
+                <span id="api-status-text">⚪ API Key not configured</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="api-toggle" onchange="toggleApiUsage()" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Patient ID Section -->
+        <div class="patient-id-section">
+            <div class="input-group">
+                <label for="patient-id">Please enter your Patient ID (P001-P100):</label>
+                <input type="text" id="patient-id" placeholder="e.g., P001, P002, ... P100" maxlength="4">
+                <div class="patient-limit-info">
+                    📝 Patient IDs range from P001 to P100 only
+                </div>
+            </div>
+            <div class="data-status" id="data-status">
+                🔄 Enter Patient ID to start conversation
+            </div>
+            <div class="security-notice">
+                <strong>Security Notice:</strong> For emergencies like broken brackets, severe pain, or wire poking, please contact your dental clinic immediately!
+            </div>
+        </div>
+
+        <!-- Chat Container -->
+        <div class="chat-container" id="chat-container">
+            <div class="message ai-message">
+                <div class="message-sender">Assistant</div>
+                <div>Hello! I'm your orthodontic assistant. Please enter your patient ID first (P001-P100), then I can help answer your orthodontic care questions.</div>
+            </div>
+        </div>
+
+        <!-- Message Input -->
+        <div class="input-section">
+            <input type="text" id="user-input" placeholder="Type your question here... (Press Enter to send)" disabled>
+            <button onclick="sendMessage()" id="send-btn" disabled>Send</button>
+        </div>
+    </div>
+
+    <!-- Researcher Dashboard Tab -->
+    <div id="researcher-tab" class="tab-content">
+        <!-- Login Section -->
+        <div class="login-section" id="login-section">
+            <h2>🔐 Research Dashboard Login</h2>
+            <p>This area is restricted to authorized researchers only.</p>
+            <input type="password" id="research-password" placeholder="Enter research access password">
+            <button onclick="login()">Access Dashboard</button>
+            <p id="login-error" style="color: red; display: none;">Incorrect password</p>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content" id="dashboard-content">
+            <h1>📊 Research Data Analysis <span class="realtime-indicator">LIVE</span></h1>
+            
+            <!-- Statistics -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Patients</h3>
+                    <div id="total-patients" style="font-size: 24px; font-weight: bold;">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Conversations</h3>
+                    <div id="total-conversations" style="font-size: 24px; font-weight: bold;">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Active Today</h3>
+                    <div id="active-today" style="font-size: 24px; font-weight: bold;">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Study Limit</h3>
+                    <div id="study-limit" style="font-size: 24px; font-weight: bold;">100 Patients</div>
+                </div>
+            </div>
+
+            <!-- Research Actions -->
+            <div class="research-actions">
+                <button onclick="exportAllData()" style="background: #4CAF50; margin: 5px;">📥 Export Complete Dataset</button>
+                <button onclick="refreshData()" style="background: #2196F3; margin: 5px;">🔄 Refresh Data</button>
+                <button onclick="clearAllData()" style="background: #f44336; margin: 5px;" id="clear-data-btn">🗑️ Clear All Data</button>
+                <button onclick="testFirebaseConnection()" style="background: #FF9800; margin: 5px;">🔥 Test Firebase</button>
+                <button onclick="addSampleData()" style="background: #9C27B0; margin: 5px;">➕ Add Sample Data</button>
+            </div>
+
+            <!-- Data Source Info -->
+            <div id="data-source-info" class="security-notice">
+                📊 Data Source: <span id="current-data-source">Firebase Realtime Database</span>
+                | 🔄 Real-time Updates: <span id="realtime-status">Active</span>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters">
+                <input type="text" id="search-patient" placeholder="Search by Patient ID (P001-P100)..." onkeyup="filterPatients()">
+                <select id="date-filter" onchange="filterByDate()">
+                    <option value="all">All Dates</option>
+                    <option value="today">Today</option>
+                    <option value="week">This Week</option>
+                    <option value="month">This Month</option>
+                </select>
+                <select id="category-filter" onchange="filterByCategory()">
+                    <option value="all">All Categories</option>
+                    <option value="pain_management">Pain Management</option>
+                    <option value="cleaning_care">Cleaning Care</option>
+                    <option value="diet_advice">Diet Advice</option>
+                    <option value="emergency">Emergency</option>
+                    <option value="wear_time">Wear Time</option>
+                    <option value="general_question">General Question</option>
+                </select>
+            </div>
+
+            <!-- Patients Container -->
+            <div id="patients-container">
+                <div class="loading">Loading research data from Firebase...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 系统配置 ====================
+        const CONFIG = {
+            // DeepSeek API Configuration - 使用服务器端代理完全解决CORS
+            deepseek: {
+                // 公共代理服务器（免费，无CORS限制）
+                proxyUrls: [
+                    'https://api.allorigins.win/raw?url=',  // 可靠的CORS代理
+                    'https://corsproxy.io/?',                // 另一个可靠代理
+                    'https://cors-proxy.htmldriven.com/?url=' // 备用代理
+                ],
+                // 直接API端点（如果代理失败尝试直接）
+                directApiUrl: 'https://api.deepseek.com/chat/completions',
+                // 备用API端点
+                backupApiUrl: 'https://api.deepseek.com/v1/chat/completions'
+            },
+            // Research Access
+            researchPassword: "ortho2024",
+            // Patient ID Configuration
+            patientIds: {
+                min: 1,
+                max: 100,
+                prefix: 'P'
+            }
+        };
+
+        // ==================== 简单可靠的CORS解决方案 ====================
+        async function callDeepSeekAPI(apiKey, messages) {
+            const requestBody = {
+                model: "deepseek-chat",
+                messages: messages,
+                stream: false,
+                max_tokens: 500
+            };
+            
+            // 方法1：使用CORS代理服务器
+            for (const proxyUrl of CONFIG.deepseek.proxyUrls) {
+                try {
+                    console.log(`🔄 Trying proxy: ${proxyUrl}`);
+                    
+                    const targetUrl = CONFIG.deepseek.directApiUrl;
+                    const fullUrl = proxyUrl + encodeURIComponent(targetUrl);
+                    
+                    const response = await fetch(fullUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${apiKey}`,
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(requestBody)
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log('✅ API call successful via proxy');
+                        return data;
+                    }
+                    
+                    console.log(`❌ Proxy failed with status: ${response.status}`);
+                } catch (error) {
+                    console.log(`❌ Proxy error: ${error.message}`);
+                }
+            }
+            
+            // 方法2：尝试直接请求（可能被CORS阻止，但有些浏览器可能允许）
+            try {
+                console.log('🔄 Trying direct API call...');
+                const response = await fetch(CONFIG.deepseek.directApiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Direct API call successful');
+                    return data;
+                }
+            } catch (error) {
+                console.log('❌ Direct API call failed:', error.message);
+            }
+            
+            // 方法3：尝试备用API端点
+            try {
+                console.log('🔄 Trying backup API endpoint...');
+                const response = await fetch(CONFIG.deepseek.backupApiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Backup API call successful');
+                    return data;
+                }
+            } catch (error) {
+                console.log('❌ Backup API call failed:', error.message);
+            }
+            
+            throw new Error('All API connection methods failed');
+        }
+
+        // ==================== API 密钥管理 ====================
+        let currentApiKey = '';
+        let apiEnabled = true;
+
+        // 从本地存储加载API密钥
+        function loadApiKey() {
+            try {
+                const savedKey = localStorage.getItem('deepseek_api_key');
+                const savedState = localStorage.getItem('api_enabled');
+                
+                if (savedKey) {
+                    currentApiKey = savedKey;
+                    document.getElementById('api-key-input').value = savedKey;
+                }
+                
+                if (savedState !== null) {
+                    apiEnabled = savedState === 'true';
+                    document.getElementById('api-toggle').checked = apiEnabled;
+                }
+                
+                updateApiStatus();
+                
+                // 自动测试API连接
+                if (currentApiKey) {
+                    setTimeout(() => {
+                        testApiKey();
+                    }, 1500);
+                }
+            } catch (error) {
+                console.error('Failed to load API key:', error);
+            }
+        }
+
+        // 保存API密钥
+        function saveApiKey() {
+            const apiKeyInput = document.getElementById('api-key-input');
+            const apiKey = apiKeyInput.value.trim();
+            
+            if (!apiKey) {
+                alert('Please enter a valid API key');
+                return;
+            }
+            
+            if (!apiKey.startsWith('sk-')) {
+                alert('API key should start with "sk-"');
+                return;
+            }
+            
+            try {
+                localStorage.setItem('deepseek_api_key', apiKey);
+                currentApiKey = apiKey;
+                
+                localStorage.setItem('api_enabled', apiEnabled.toString());
+                
+                updateApiStatus();
+                
+                // 显示成功消息
+                const statusDiv = document.getElementById('api-status-text');
+                statusDiv.innerHTML = '✅ API Key saved successfully!';
+                statusDiv.parentElement.className = 'api-status api-active';
+                
+                // 自动测试
+                setTimeout(() => {
+                    testApiKey();
+                }, 500);
+                
+            } catch (error) {
+                alert('Failed to save API key: ' + error.message);
+            }
+        }
+
+        // 测试API密钥
+        async function testApiKey() {
+            if (!currentApiKey) {
+                alert('Please save an API key first');
+                return;
+            }
+            
+            const statusDiv = document.getElementById('api-status-text');
+            statusDiv.innerHTML = '🔄 Testing API connection...';
+            statusDiv.parentElement.className = 'api-status';
+            
+            try {
+                // 简单的测试请求
+                const testResponse = await callDeepSeekAPI(currentApiKey, [
+                    { role: "system", content: "You are a test assistant. Respond with 'API test successful'." },
+                    { role: "user", content: "Test" }
+                ]);
+                
+                if (testResponse && testResponse.choices && testResponse.choices[0]) {
+                    statusDiv.innerHTML = '✅ API connection successful!';
+                    statusDiv.parentElement.className = 'api-status api-active';
+                    
+                    // 启用API
+                    apiEnabled = true;
+                    localStorage.setItem('api_enabled', 'true');
+                    document.getElementById('api-toggle').checked = true;
+                    
+                    // 启用输入框
+                    const patientId = document.getElementById('patient-id').value.trim();
+                    const isValid = isValidPatientId(patientId);
+                    if (isValid) {
+                        document.getElementById('user-input').disabled = false;
+                        document.getElementById('send-btn').disabled = false;
+                    }
+                    
+                    return true;
+                } else {
+                    throw new Error('Invalid API response');
+                }
+            } catch (error) {
+                console.error('API test failed:', error);
+                statusDiv.innerHTML = '⚠️ API connection failed. Using backup system.';
+                statusDiv.parentElement.className = 'api-status api-inactive';
+                
+                // 禁用API，使用备用系统
+                apiEnabled = false;
+                localStorage.setItem('api_enabled', 'false');
+                document.getElementById('api-toggle').checked = false;
+                
+                return false;
+            }
+        }
+
+        // 切换API使用状态
+        function toggleApiUsage() {
+            const toggle = document.getElementById('api-toggle');
+            apiEnabled = toggle.checked;
+            localStorage.setItem('api_enabled', apiEnabled.toString());
+            
+            updateApiStatus();
+            
+            // 更新患者ID输入状态
+            const patientId = document.getElementById('patient-id').value.trim();
+            const isValid = isValidPatientId(patientId);
+            
+            if (isValid) {
+                document.getElementById('user-input').disabled = false;
+                document.getElementById('send-btn').disabled = false;
+            } else {
+                document.getElementById('user-input').disabled = true;
+                document.getElementById('send-btn').disabled = true;
+            }
+        }
+
+        // 更新API状态显示
+        function updateApiStatus() {
+            const statusDiv = document.getElementById('api-status-text');
+            
+            if (!currentApiKey) {
+                statusDiv.innerHTML = '❌ No API key configured';
+                statusDiv.parentElement.className = 'api-status api-inactive';
+                return;
+            }
+            
+            if (apiEnabled) {
+                statusDiv.innerHTML = '✅ API Enabled';
+                statusDiv.parentElement.className = 'api-status api-active';
+            } else {
+                statusDiv.innerHTML = '⚠️ API Disabled (Using backup system)';
+                statusDiv.parentElement.className = 'api-status api-inactive';
+            }
+        }
+
+        // ==================== FIREBASE 数据管理 ====================
+        let realtimeListener = null;
+
+        // 保存数据到 Firebase
+        async function saveToFirebase(conversationData) {
+            try {
+                const timestamp = Date.now();
+                const conversationId = `conv_${timestamp}_${conversationData.patientId}`;
+                const conversationsRef = window.firebaseRef(window.firebaseDatabase, `conversations/${conversationId}`);
+                
+                await window.firebaseSet(conversationsRef, {
+                    ...conversationData,
+                    firebaseId: conversationId,
+                    savedAt: timestamp
+                });
+                
+                console.log('✅ Data saved to Firebase:', conversationId);
+                updateConnectionStatus(true);
+                return true;
+                
+            } catch (error) {
+                console.error('❌ Firebase save failed:', error);
+                updateConnectionStatus(false);
+                
+                // 降级到本地存储
+                saveToLocalStorage(conversationData);
+                return false;
+            }
+        }
+
+        // 从 Firebase 加载数据
+        async function loadFromFirebase() {
+            return new Promise((resolve, reject) => {
+                const conversationsRef = window.firebaseRef(window.firebaseDatabase, 'conversations');
+                
+                window.firebaseOnValue(conversationsRef, (snapshot) => {
+                    const data = [];
+                    snapshot.forEach((childSnapshot) => {
+                        data.push(childSnapshot.val());
+                    });
+                    console.log('✅ Data loaded from Firebase, count:', data.length);
+                    updateConnectionStatus(true);
+                    resolve(data);
+                    
+                    // 取消监听，因为我们只需要一次数据
+                    window.firebaseOff(conversationsRef);
+                }, (error) => {
+                    console.error('❌ Failed to load from Firebase:', error);
+                    updateConnectionStatus(false);
+                    reject(error);
+                });
+            });
+        }
+
+        // 设置实时监听
+        function setupRealtimeListener() {
+            if (realtimeListener) {
+                const conversationsRef = window.firebaseRef(window.firebaseDatabase, 'conversations');
+                window.firebaseOff(conversationsRef, 'child_added');
+            }
+            
+            const conversationsRef = window.firebaseRef(window.firebaseDatabase, 'conversations');
+            realtimeListener = window.firebaseOnValue(conversationsRef, (snapshot) => {
+                console.log('🔄 New data detected in real-time');
+                refreshData(); // 刷新数据显示
+            });
+            
+            console.log('✅ Real-time listener activated');
+        }
+
+        // 清除所有数据
+        async function clearAllData() {
+            if (!confirm('⚠️ Are you sure you want to delete ALL data from Firebase? This action cannot be undone!')) {
+                return;
+            }
+            
+            try {
+                const conversationsRef = window.firebaseRef(window.firebaseDatabase, 'conversations');
+                await window.firebaseRemove(conversationsRef);
+                console.log('✅ All data cleared from Firebase');
+                alert('All data has been cleared successfully!');
+                refreshData();
+            } catch (error) {
+                console.error('❌ Failed to clear data:', error);
+                alert('Error clearing data: ' + error.message);
+            }
+        }
+
+        // 测试 Firebase 连接
+        async function testFirebaseConnection() {
+            const testData = {
+                patientId: "TEST001",
+                timestamp: new Date().toISOString(),
+                question: "Firebase connection test",
+                response: "Test response from Firebase v9",
+                category: "test",
+                requiresClinic: false,
+                questionLength: 25,
+                responseLength: 28,
+                testTimestamp: Date.now()
+            };
+
+            try {
+                await saveToFirebase(testData);
+                alert('✅ Firebase v9 connection test successful! Check your Firebase console for the test data.');
+            } catch (error) {
+                alert('❌ Firebase connection test failed: ' + error.message);
+            }
+        }
+
+        // 添加示例数据
+        async function addSampleData() {
+            const sampleData = [
+                {
+                    patientId: "P001",
+                    timestamp: new Date().toISOString(),
+                    question: "How often should I brush my teeth with braces?",
+                    response: "You should brush your teeth after every meal, at least 3 times a day. Pay special attention to cleaning around the brackets and wires.",
+                    category: "cleaning_care",
+                    requiresClinic: false,
+                    questionLength: 48,
+                    responseLength: 145
+                },
+                {
+                    patientId: "P002",
+                    timestamp: new Date(Date.now() - 86400000).toISOString(), // Yesterday
+                    question: "My braces are causing pain, what should I do?",
+                    response: "Some discomfort is normal after adjustments. You can rinse with warm salt water and take over-the-counter pain relievers if needed. If the pain is severe, please contact your clinic.",
+                    category: "pain_management",
+                    requiresClinic: false,
+                    questionLength: 45,
+                    responseLength: 185
+                }
+            ];
+
+            try {
+                for (const data of sampleData) {
+                    await saveToFirebase(data);
+                }
+                alert('✅ Sample data added successfully!');
+                refreshData();
+            } catch (error) {
+                alert('❌ Failed to add sample data: ' + error.message);
+            }
+        }
+
+        // ==================== 连接状态管理 ====================
+        function updateConnectionStatus(connected) {
+            const statusElement = document.getElementById('connection-status');
+            const realtimeStatus = document.getElementById('realtime-status');
+            
+            if (connected) {
+                statusElement.textContent = '🟢 Firebase Connected';
+                statusElement.className = 'connection-status connection-online';
+                realtimeStatus.textContent = 'Active';
+                realtimeStatus.style.color = '#4CAF50';
+            } else {
+                statusElement.textContent = '🔴 Firebase Offline';
+                statusElement.className = 'connection-status connection-offline';
+                realtimeStatus.textContent = 'Offline';
+                realtimeStatus.style.color = '#f44336';
+            }
+        }
+
+        // ==================== 本地存储备份 ====================
+        function saveToLocalStorage(conversationData) {
+            try {
+                let allData = JSON.parse(localStorage.getItem('orthodontic_backup')) || [];
+                allData.push({
+                    ...conversationData,
+                    backupTimestamp: new Date().toISOString(),
+                    source: 'local_backup'
+                });
+                localStorage.setItem('orthodontic_backup', JSON.stringify(allData));
+                console.log('📦 Data backed up locally, total:', allData.length);
+            } catch (error) {
+                console.error('Local storage failed:', error);
+            }
+        }
+
+        function loadFromLocalStorage() {
+            try {
+                const backupData = JSON.parse(localStorage.getItem('orthodontic_backup')) || [];
+                console.log('📦 Loaded from local storage, count:', backupData.length);
+                return backupData;
+            } catch (error) {
+                console.error('Failed to load from local storage:', error);
+                return [];
+            }
+        }
+
+        // ==================== 患者助手功能 ====================
+        const patientIdInput = document.getElementById('patient-id');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const chatContainer = document.getElementById('chat-container');
+        const dataStatus = document.getElementById('data-status');
+
+        // 患者ID验证
+        function isValidPatientId(patientId) {
+            const regex = /^P(0[0-9][0-9]|100)$/;
+            if (!regex.test(patientId)) return false;
+            const number = parseInt(patientId.substring(1));
+            return number >= CONFIG.patientIds.min && number <= CONFIG.patientIds.max;
+        }
+
+        function formatPatientId(input) {
+            let value = input.toUpperCase().trim();
+            value = value.replace(/[^P0-9]/g, '');
+            if (!value.startsWith('P')) value = 'P' + value;
+            value = value.replace(/^P+/, 'P');
+            return value.length > 4 ? value.substring(0, 4) : value;
+        }
+
+        // 患者ID输入监听
+        patientIdInput.addEventListener('input', function() {
+            this.value = formatPatientId(this.value);
+            const patientId = this.value.trim();
+            const isValid = isValidPatientId(patientId);
+            
+            // 总是允许使用（API或备用系统）
+            if (isValid) {
+                userInput.disabled = false;
+                sendBtn.disabled = false;
+            } else {
+                userInput.disabled = true;
+                sendBtn.disabled = true;
+            }
+            
+            if (patientId.length > 0 && !isValid) {
+                this.style.borderColor = '#f44336';
+                dataStatus.innerHTML = '❌ Please enter a valid Patient ID (P001-P100)';
+                dataStatus.style.background = '#ffebee';
+            } else if (isValid) {
+                this.style.borderColor = '#4CAF50';
+                dataStatus.innerHTML = '✅ Valid Patient ID - Ready to chat';
+                dataStatus.style.background = '#e8f5e8';
+                userInput.focus();
+            } else {
+                this.style.borderColor = '#ddd';
+                dataStatus.innerHTML = '🔄 Enter Patient ID (P001-P100)';
+                dataStatus.style.background = '#e8f5e8';
+            }
+        });
+
+        userInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !sendBtn.disabled) sendMessage();
+        });
+
+        // 显示消息
+        function displayMessage(sender, text, isError = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = isError ? 'error' : `message ${sender === 'user' ? 'user-message' : 'ai-message'}`;
+            
+            if (!isError) {
+                const senderDiv = document.createElement('div');
+                senderDiv.className = 'message-sender';
+                senderDiv.textContent = sender === 'user' ? `Patient ${patientIdInput.value}` : 'Assistant';
+                messageDiv.appendChild(senderDiv);
+            }
+            
+            const textDiv = document.createElement('div');
+            textDiv.textContent = text;
+            messageDiv.appendChild(textDiv);
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // 问题分类
+        function categorizeQuestion(question) {
+            const lowerQuestion = question.toLowerCase();
+            if (lowerQuestion.includes('pain') || lowerQuestion.includes('hurt') || lowerQuestion.includes('sore')) return 'pain_management';
+            if (lowerQuestion.includes('clean') || lowerQuestion.includes('brush') || lowerQuestion.includes('hygiene')) return 'cleaning_care';
+            if (lowerQuestion.includes('food') || lowerQuestion.includes('eat') || lowerQuestion.includes('diet')) return 'diet_advice';
+            if (lowerQuestion.includes('broken') || lowerQuestion.includes('loose') || lowerQuestion.includes('emergency')) return 'emergency';
+            if (lowerQuestion.includes('time') || lowerQuestion.includes('wear') || lowerQuestion.includes('hours')) return 'wear_time';
+            return 'general_question';
+        }
+
+        // 备用AI响应系统
+        function getBackupAIResponse(question, patientId) {
+            const lowerQuestion = question.toLowerCase();
+            
+            // 紧急情况检测
+            const emergencies = [
+                'broken bracket', 'loose bracket', 'wire poking', 'severe pain',
+                'swelling', 'bleeding', 'broken wire', 'broken aligner',
+                'broken retainer', 'lost attachment', 'cracked bracket'
+            ];
+            
+            for (const emergency of emergencies) {
+                if (lowerQuestion.includes(emergency)) {
+                    return `I've detected that you're describing an orthodontic emergency. Please contact your dental clinic immediately for assistance with "${emergency}". This requires professional attention as soon as possible.`;
+                }
+            }
+            
+            // 特定问题类别响应
+            if (lowerQuestion.includes('brush') || lowerQuestion.includes('clean') || lowerQuestion.includes('hygiene')) {
+                return `For braces cleaning, I recommend brushing after every meal using a soft-bristled toothbrush. Use fluoride toothpaste and pay special attention to cleaning around brackets and wires. Consider using an interdental brush or water flosser for better cleaning between teeth.`;
+            }
+            
+            if (lowerQuestion.includes('pain') || lowerQuestion.includes('hurt') || lowerQuestion.includes('sore')) {
+                return `Some discomfort is normal after braces adjustments or when you first get braces. You can rinse with warm salt water (1/2 teaspoon salt in 1 cup warm water) and take over-the-counter pain relievers like ibuprofen if needed, following package instructions. If the pain is severe or persistent, please contact your clinic.`;
+            }
+            
+            if (lowerQuestion.includes('food') || lowerQuestion.includes('eat') || lowerQuestion.includes('diet')) {
+                return `With braces, avoid hard, sticky, or chewy foods that can damage brackets. Cut food into small pieces, avoid biting directly into hard foods like apples or corn on the cob. Some good choices include yogurt, mashed potatoes, smoothies, and soft fruits.`;
+            }
+            
+            if (lowerQuestion.includes('time') || lowerQuestion.includes('wear') || lowerQuestion.includes('hours')) {
+                return `For aligners/retainers, wear them 20-22 hours daily as directed by your orthodontist. Remove only for eating, drinking (except water), brushing, and flossing. Consistent wear time is crucial for treatment success.`;
+            }
+            
+            if (lowerQuestion.includes('rubber') || lowerQuestion.includes('elastic')) {
+                return `If your orthodontist has given you rubber bands/elastics, wear them as instructed (usually 24/7 except when eating and brushing). Change them daily or as directed. Proper elastic wear helps align your bite correctly.`;
+            }
+            
+            // 通用响应
+            const generalResponses = [
+                `Thank you for your question about orthodontic care. I'm here to help with general guidance on braces care and maintenance. For specific concerns about your treatment plan, please contact your orthodontist directly during office hours.`,
+                `I understand you have a question about your orthodontic treatment. While I can provide general care advice, please remember that your orthodontist is the best person to address specific treatment questions. Always follow the instructions provided by your dental clinic.`,
+                `For orthodontic questions, it's important to follow the specific advice from your dental clinic. General care includes maintaining good oral hygiene, attending all scheduled appointments, and following dietary recommendations. If you're unsure about any aspect of your treatment, don't hesitate to contact your clinic.`
+            ];
+            
+            return generalResponses[Math.floor(Math.random() * generalResponses.length)];
+        }
+
+        // 发送消息
+        async function sendMessage() {
+            const patientId = patientIdInput.value.trim();
+            const message = userInput.value.trim();
+            
+            if (!isValidPatientId(patientId)) {
+                alert('Please enter a valid Patient ID (P001-P100)');
+                return;
+            }
+            
+            if (!message) {
+                alert('Please enter a question');
+                return;
+            }
+
+            displayMessage('user', message);
+            userInput.value = '';
+            
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'loading';
+            loadingDiv.textContent = 'Assistant is thinking...';
+            loadingDiv.id = 'loading-indicator';
+            chatContainer.appendChild(loadingDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            userInput.disabled = true;
+            sendBtn.disabled = true;
+            dataStatus.innerHTML = '🔄 Processing your question...';
+            dataStatus.style.background = '#e3f2fd';
+            
+            let aiResponse = '';
+            let apiSuccess = false;
+            let usedApi = false;
+            
+            try {
+                // 检查是否使用API
+                if (apiEnabled && currentApiKey) {
+                    const systemPrompt = `You are a professional orthodontic assistant specializing in helping adolescent orthodontic patients.
+
+Patient ID: ${patientId}
+
+Please follow these rules:
+1. Respond in a friendly, warm tone using simple, easy-to-understand language
+2. Provide only orthodontic care advice, no medical diagnoses
+3. If the user mentions any of the following, you MUST clearly respond: "Please contact your dental clinic immediately!"
+   - Broken or loose brackets
+   - Wires poking and causing ulcers
+   - Severe pain or swelling
+   - Broken aligners/retainers
+   - Lost attachments
+   - Any other acute discomfort
+
+4. Focus on orthodontic-related topics such as:
+   - Braces cleaning methods
+   - Dietary restrictions
+   - Wear time requirements
+   - Relief for minor discomfort
+   - Preparation for appointments`;
+
+                    console.log('🔄 Attempting to call DeepSeek API...');
+                    
+                    // 使用CORS安全的API调用
+                    const response = await callDeepSeekAPI(currentApiKey, [
+                        { role: "system", content: systemPrompt },
+                        { role: "user", content: message }
+                    ]);
+                    
+                    if (response && response.choices && response.choices[0]) {
+                        aiResponse = response.choices[0].message.content;
+                        apiSuccess = true;
+                        usedApi = true;
+                        console.log('✅ API call successful');
+                    } else {
+                        throw new Error('Invalid API response');
+                    }
+                } else {
+                    // API未启用或没有API密钥，使用备用系统
+                    throw new Error('API disabled or no API key');
+                }
+                
+            } catch (error) {
+                console.error('DeepSeek API error, using backup system:', error.message);
+                // 使用备用AI响应系统
+                aiResponse = getBackupAIResponse(message, patientId);
+                apiSuccess = true; // 备用系统总是成功
+                usedApi = false;
+            }
+
+            // 显示响应
+            displayMessage('ai', aiResponse);
+            
+            const conversationData = {
+                patientId: patientId,
+                timestamp: new Date().toISOString(),
+                question: message,
+                response: aiResponse,
+                category: categorizeQuestion(message),
+                requiresClinic: aiResponse.toLowerCase().includes('contact your dental clinic immediately'),
+                questionLength: message.length,
+                responseLength: aiResponse.length,
+                apiUsed: usedApi ? 'deepseek' : 'backup_system',
+                apiSuccess: apiSuccess,
+                apiEnabled: apiEnabled,
+                hasApiKey: !!currentApiKey
+            };
+            
+            // 保存到 Firebase
+            try {
+                await saveToFirebase(conversationData);
+                dataStatus.innerHTML = '✅ Response saved successfully';
+                dataStatus.style.background = '#e8f5e8';
+                
+                if (!usedApi) {
+                    // 显示备用系统的通知
+                    const backupNotice = document.createElement('div');
+                    backupNotice.className = 'security-notice';
+                    backupNotice.style.margin = '10px 0';
+                    backupNotice.innerHTML = '<strong>ℹ️ Note:</strong> Using backup orthodontic knowledge base. Responses are general guidance only.';
+                    chatContainer.appendChild(backupNotice);
+                }
+                
+            } catch (error) {
+                console.error('Save to Firebase failed:', error);
+                displayMessage('ai', '⚠️ Response generated but could not save to database. Data has been backed up locally.', true);
+                saveToLocalStorage(conversationData);
+            } finally {
+                const loadingIndicator = document.getElementById('loading-indicator');
+                if (loadingIndicator) loadingIndicator.remove();
+                
+                userInput.disabled = false;
+                sendBtn.disabled = false;
+                userInput.focus();
+            }
+        }
+
+        // ==================== 研究员面板功能 ====================
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabName === 'researcher-tab') {
+                refreshData();
+                setupRealtimeListener();
+            }
+        }
+
+        function login() {
+            const password = document.getElementById('research-password').value;
+            const errorElement = document.getElementById('login-error');
+            
+            if (password === CONFIG.researchPassword) {
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('dashboard-content').style.display = 'block';
+                refreshData();
+                setupRealtimeListener();
+            } else {
+                errorElement.style.display = 'block';
+            }
+        }
+
+        async function refreshData() {
+            const container = document.getElementById('patients-container');
+            
+            try {
+                container.innerHTML = '<div class="loading">🔄 Loading data from Firebase...</div>';
+                const data = await loadFromFirebase();
+                displayPatientAnalysis(data);
+                updateStatistics(data);
+                
+            } catch (error) {
+                console.error('Refresh failed:', error);
+                const localData = loadFromLocalStorage();
+                if (localData.length > 0) {
+                    displayPatientAnalysis(localData);
+                    updateStatistics(localData);
+                    container.innerHTML = '<div class="error">⚠️ Using local backup data - Firebase connection failed</div>' + container.innerHTML;
+                } else {
+                    container.innerHTML = '<div class="error">❌ No data available. Please check Firebase connection.</div>';
+                }
+            }
+        }
+
+        function displayPatientAnalysis(data) {
+            const container = document.getElementById('patients-container');
+            
+            if (!data || data.length === 0) {
+                container.innerHTML = '<div class="patient-card">No research data available yet. Start by having patients ask questions.</div>';
+                return;
+            }
+
+            const patients = groupDataByPatient(data);
+            
+            container.innerHTML = Object.entries(patients).map(([patientId, conversations]) => {
+                const questionTypes = analyzeQuestionTypes(conversations);
+                const activityLevel = analyzeActivityLevel(conversations);
+                const lastActive = getLastActive(conversations);
+                const backupUsage = conversations.filter(c => c.apiUsed === 'backup_system').length;
+                
+                return `
+                    <div class="patient-card" data-patient-id="${patientId}">
+                        <h3>Patient ${patientId}</h3>
+                        <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                            <span>📅 ${conversations.length} questions</span>
+                            <span>🕒 Last active: ${lastActive}</span>
+                            <span>📊 Activity: ${activityLevel}</span>
+                        </div>
+                        
+                        <div style="margin: 10px 0;">
+                            <strong>Common Question Types:</strong>
+                            <div style="font-size: 0.9em; color: #666;">
+                                ${questionTypes.slice(0, 3).map(type => 
+                                    `<span style="background: #e3f2fd; padding: 2px 6px; margin: 2px; border-radius: 3px; display: inline-block;">
+                                        ${type.replace('_', ' ')}
+                                    </span>`
+                                ).join('')}
+                            </div>
+                            ${backupUsage > 0 ? 
+                                `<div style="color: #ff9800; font-size: 0.8em; margin-top: 5px;">
+                                    ⚠️ ${backupUsage} responses from backup system
+                                </div>` : ''
+                            }
+                        </div>
+                        
+                        <button onclick="viewPatientDetails('${patientId}')" 
+                                style="background: #4CAF50; width: auto; padding: 5px 15px;">
+                            View Full History
+                        </button>
+                        
+                        <div id="details-${patientId}" style="display: none; margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px;">
+                            ${conversations.map(conv => `
+                                <div style="margin: 10px 0; padding: 10px; background: #f9f9f9; border-radius: 5px;">
+                                    <div style="color: #666; font-size: 0.9em;">
+                                        ${new Date(conv.timestamp).toLocaleString()}
+                                        ${conv.source === 'local_backup' ? ' (Local Backup)' : ''}
+                                        ${conv.apiUsed === 'backup_system' ? ' (Backup System)' : ''}
+                                    </div>
+                                    <div><strong>Q:</strong> ${conv.question}</div>
+                                    <div><strong>A:</strong> ${conv.response}</div>
+                                    <div><strong>Category:</strong> ${conv.category}</div>
+                                    ${conv.requiresClinic ? '<div style="color: red; font-weight: bold;">⚠️ Required clinic contact</div>' : ''}
+                                    ${conv.apiUsed === 'backup_system' ? '<div style="color: #ff9800; font-weight: bold;">⚠️ Used backup AI system</div>' : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function groupDataByPatient(data) {
+            const patients = {};
+            data.forEach(conv => {
+                if (!patients[conv.patientId]) patients[conv.patientId] = [];
+                patients[conv.patientId].push(conv);
+            });
+            return patients;
+        }
+
+        function analyzeQuestionTypes(conversations) {
+            const typeCounts = {};
+            conversations.forEach(conv => {
+                typeCounts[conv.category] = (typeCounts[conv.category] || 0) + 1;
+            });
+            return Object.entries(typeCounts).sort((a, b) => b[1] - a[1]).map(([type]) => type);
+        }
+
+        function analyzeActivityLevel(conversations) {
+            const count = conversations.length;
+            if (count >= 10) return 'High';
+            if (count >= 5) return 'Medium';
+            return 'Low';
+        }
+
+        function getLastActive(conversations) {
+            const last = conversations[conversations.length - 1];
+            return new Date(last.timestamp).toLocaleDateString();
+        }
+
+        function viewPatientDetails(patientId) {
+            const detailsDiv = document.getElementById(`details-${patientId}`);
+            detailsDiv.style.display = detailsDiv.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function updateStatistics(data) {
+            const patients = groupDataByPatient(data);
+            const today = new Date().toDateString();
+            const activeToday = Object.values(patients).filter(convos => 
+                convos.some(conv => new Date(conv.timestamp).toDateString() === today)
+            ).length;
+            
+            const backupResponses = data.filter(conv => conv.apiUsed === 'backup_system').length;
+            
+            document.getElementById('total-patients').textContent = Object.keys(patients).length;
+            document.getElementById('total-conversations').textContent = data.length;
+            document.getElementById('active-today').textContent = activeToday;
+            
+            if (backupResponses > 0) {
+                document.getElementById('total-conversations').innerHTML += 
+                    `<span style="font-size: 12px; color: #ff9800;"> (${backupResponses} backup)</span>`;
+            }
+        }
+
+        async function exportAllData() {
+            try {
+                let data = await loadFromFirebase();
+                let csvContent = "PatientID,Timestamp,Question,Response,Category,RequiresClinic,QuestionLength,ResponseLength,API_Used,API_Success\n";
+                
+                data.forEach(conv => {
+                    const row = [
+                        conv.patientId,
+                        conv.timestamp,
+                        `"${(conv.question || '').replace(/"/g, '""')}"`,
+                        `"${(conv.response || '').replace(/"/g, '""')}"`,
+                        conv.category,
+                        conv.requiresClinic,
+                        conv.questionLength,
+                        conv.responseLength,
+                        conv.apiUsed || 'unknown',
+                        conv.apiSuccess || false
+                    ].join(',');
+                    csvContent += row + '\n';
+                });
+                
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `orthodontic_research_${new Date().toISOString().split('T')[0]}.csv`;
+                a.click();
+                window.URL.revokeObjectURL(url);
+                
+            } catch (error) {
+                alert('Export failed: ' + error.message);
+            }
+        }
+
+        function filterPatients() {
+            const searchTerm = document.getElementById('search-patient').value.toLowerCase();
+            const cards = document.querySelectorAll('.patient-card');
+            cards.forEach(card => {
+                const patientId = card.getAttribute('data-patient-id').toLowerCase();
+                card.style.display = patientId.includes(searchTerm) ? 'block' : 'none';
+            });
+        }
+
+        function filterByDate() {
+            refreshData();
+        }
+
+        function filterByCategory() {
+            refreshData();
+        }
+
+        // ==================== 初始化 ====================
+        console.log('Orthodontic Research System with Firebase v9 loaded successfully');
+        
+        // 加载API密钥
+        loadApiKey();
+        
+        // 初始连接测试
+        setTimeout(() => {
+            testFirebaseConnection().catch(() => {
+                console.log('Firebase connection test failed - using offline mode');
+            });
+        }, 2000);
+
+    </script>
+</body>
+</html>
